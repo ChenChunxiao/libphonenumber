@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.googlecode.libphonenumber</groupId>
+  <!-- DO NOT USE: This is not released to Maven Central. The libphonenumber
+       there comes from ../pom.xml. This here is an UNSTABLE experimental
+       subset of that where we add and remove subsets of metadata, breaking
+       backward-compatibility. -->
+  <artifactId>libphonenumber-experimental-unstable</artifactId>
+  <version>7.4.4-SNAPSHOT</version>
+
+  <parent>
+    <groupId>com.googlecode.libphonenumber</groupId>
+    <artifactId>libphonenumber-parent</artifactId>
+    <version>7.4.4-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <build>
+    <!-- Same source as ../pom.xml, tested there. -->
+    <sourceDirectory>../src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src/com/google/i18n/phonenumbers/data</directory>
+        <targetPath>com/google/i18n/phonenumbers/data</targetPath>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <mkdir dir="src/com/google/i18n/phonenumbers/data"/>
+                <exec executable="java">
+                  <arg value="-jar"/>
+                  <arg value="../../../tools/java/java-build/target/java-build-1.0-SNAPSHOT-jar-with-dependencies.jar"/>
+                  <arg value="BuildMetadataProtoFromXml"/>
+                  <arg value="--input-file=../../../resources/PhoneNumberMetadata.xml"/>
+                  <arg value="--output-dir=src/com/google/i18n/phonenumbers"/>
+                  <arg value="--data-prefix=data/PhoneNumberMetadataProto"/>
+                  <arg value="--mapping-class=CountryCodeToRegionCodeMap"/>
+                  <!-- The year to use in the copyright header of
+                       CountryCodeToRegionCodeMap.java. -->
+                  <arg value="--copyright=2010"/>
+                  <arg value="--lite-build=true"/>
+                </exec>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>protobuf-java-lib</id>
+      <url>file://${project.basedir}/../lib</url>
+    </repository>
+  </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.6.1</version>
+    </dependency>
+  </dependencies>
+
+</project>
